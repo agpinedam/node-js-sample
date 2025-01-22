@@ -1,17 +1,34 @@
-version: 2.1
+version: 2.1  # Habilita el uso de orbs y funciones avanzadas
 
 orbs:
-  node: circleci/node@4.7.0  # Importa el orb de Node.js
+  node: circleci/node@5.0.0  # Usa el orb oficial de Node.js
 
 jobs:
   build:
-    executor: node/default  # Usa el ejecutor predefinido del orb
+    docker:
+      - image: circleci/node:16  # Usa una imagen base de Node.js 16
     steps:
-      - checkout
-      - node/install-packages  # Comando predefinido del orb para instalar dependencias
+      - checkout  # Descarga el código del repositorio
+      - run:
+          name: Listar archivos del proyecto
+          command: ls -la  # Ayuda a depurar rutas si es necesario
+      - restore_cache:
+          keys:
+            - node-cache-{{ checksum "package-lock.json" }}
+            - node-cache-  # Caché alternativo si no se encuentra un checksum
+      - run:
+          name: Instalar dependencias
+          command: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: node-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Ejecutar pruebas
+          command: npm test
 
 workflows:
   version: 2
-  build-and-test:
+  build_and_test:
     jobs:
       - build

@@ -34,7 +34,7 @@ jobs:
     # 5. Probar la aplicación
     - name: Test Docker Container
       run: |
-        docker run -d -p 3000:3000 --name test-container node-js-sample
+        docker run -d -p 3000:8080 --name test-container node-js-sample
         sleep 5
         curl -f http://localhost:3000 || exit 1
         docker stop test-container && docker rm test-container

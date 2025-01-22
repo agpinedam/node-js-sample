@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Test Docker Container
           command: |
-            docker run -d -p 3000:3000 --name test-container $DOCKERHUB_USERNAME/node-js-sample
+            docker run -d -p 3000:8080 --name test-container $DOCKERHUB_USERNAME/node-js-sample
             sleep 10 # Espera a que la aplicación inicie
             curl -f http://localhost:3000 || (docker logs test-container && exit 1)
       - run:

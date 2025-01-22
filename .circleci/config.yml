@@ -1,29 +1,17 @@
 version: 2.1
 
+orbs:
+  node: circleci/node@4.7.0  # Importa el orb de Node.js
+
 jobs:
   build:
-    docker:
-      - image: cimg/node:18.17 # Imagen base con Node.js
+    executor: node/default  # Usa el ejecutor predefinido del orb
     steps:
-      - checkout # Clona el repositorio
-      - setup_remote_docker # Habilita Docker en CircleCI
-      - run:
-          name: Build Docker Image
-          command: docker build -t $DOCKERHUB_USERNAME/node-js-sample .
-      - run:
-          name: Test Docker Container
-          command: |
-            docker run -d -p 3000:8080 --name test-container $DOCKERHUB_USERNAME/node-js-sample
-            sleep 10 # Espera a que la aplicación inicie
-            curl -f http://localhost:3000 || (docker logs test-container && exit 1)
-      - run:
-          name: Push Docker Image to DockerHub
-          command: |
-            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-            docker push $DOCKERHUB_USERNAME/node-js-sample
+      - checkout
+      - node/install-packages  # Comando predefinido del orb para instalar dependencias
 
 workflows:
   version: 2
-  build_and_push:
+  build-and-test:
     jobs:
       - build
